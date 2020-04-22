@@ -26,10 +26,34 @@ class Api:
         """ Realiza una peticion HTTP GET psandole datos y header """
         
         headers={'Content-Type':'multipart/form-data'}
-        x = requests.post(self.url,headers=headers,data = self.dic)
-        return  x.text
+        self.x = requests.post(self.url,headers=headers,data = self.dic)
+        return  self.x
 
-    
+    def show(self):
+        """ RESPONSE retorna y muestra status, Headers y Body """
+        
+        status = self.x.status_code
+        head = self.x.headers
+        body = self.x.text
+
+        print('HTTP code : '+str(status)  )
+
+        print('----------------------------------------------')        
+        
+        for n in head:
+            if n == 'Content-Type':
+                print('Headers : '+str(n)+(' : ')+str(head[n]) )
+        
+        print('----------------------------------------------')                          
+        
+        print('Body (Json): '+ str(body))
+
+        return status,head,body
+        
+
+          
+            
+
 
 
 
@@ -37,5 +61,5 @@ if __name__ == "__main__":
     
     eddesa_t = Api()
     eddesa_t.build_dic('ivr','ivr_vis2020', 'password')
-    result = eddesa_t.test()
-    print(result)
+    eddesa_t.test()
+    eddesa_t.show()
