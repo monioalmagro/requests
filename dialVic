@@ -1,0 +1,74 @@
+#!/usr/bin/env python2
+#
+import requests
+
+class Api:
+  """ Clase para interactuar con la API de Dapplet v7 """
+
+  url = ""     # URL base de la API
+
+  # Metodo constructor
+  # @param h string Nombre de host del Dial7
+  # @param t string Token para interactuar con la API
+  def __init__(self,h,t):
+    """ Inicializo url """
+    self.url = "http://" + h + "/dial-web/api.php?c=1&k=" + t
+
+  def httpGet(self,p):
+    """ Realiza una peticion HTTP GET a una URL determinada """
+    return requests.get(url = self.url, params = p)
+
+  def getSessions(self, oneday='', username='', page=1):
+    """ Recupera todos los estados de un operador """
+    if not oneday:
+      return False
+
+    if not username:
+      return False
+
+    # Parametros base a enviar
+    params = {'a': 'getSessions',
+              'oneday': oneday,
+              'username': username,
+              'page': page,
+              'limit': 100,
+              'orderby': 'startdate'}
+
+    # Send the request
+    res = self.httpGet(params).json()
+
+    # Return the list of recordings
+    return res
+
+  def getLastSession(self, oneday = '', username = ''):
+    if not oneday:
+      return {}
+
+    if not username:
+      return {}
+
+    page = 1
+    last_session = []
+
+    while True:
+      r = self.getSessions(oneday = oneday, username = username, page=page)
+
+      if len(r['DATA']) == 0:
+        break
+
+      page = page + 1
+      last_session = r['DATA']
+
+    i = len(last_session)
+
+    if i:
+      return last_session[i-1]
+    else:
+      return {}
+
+if __name__== "__main__":
+
+  dial7 = Api("172.15.1.240","91c8kIKF1SPkcxW3mgqDb3NQ")
+  last_session = dial7.getLastSession(oneday = '2019-06-09', username = 'HernanRider')
+  print(last_session)
+
