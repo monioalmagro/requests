@@ -1,0 +1,34 @@
+#!/usr/local/bin/python2.7
+from   asterisk.agi import *
+import sys
+
+import estado_tecnico
+
+if __name__ == '__main__':
+
+  # Inicializo la comunicacion con Asterisk...
+  agi = AGI()
+  agi.verbose('Consultando estado tecnico...')
+
+  # Recupero el API_TOKEN
+  token = agi.get_variable('API_TOKEN')
+  if not token:
+    agi.verbose('No se encontro la variable de canal API_TOKEN')
+    sys.exit(1)
+
+  # Recupero el NIS
+  nis = agi.get_variable('NIS')
+  if not nis:
+    agi.verbose('No se encontro la variable de canal NIS')
+    sys.exit(1)
+
+  et = estado_tecnico.ET( token )
+  estado = et.get( nis )
+
+  if 'EstadoTecnico' not in estado:
+    agi.verbose('NIS invalido.')
+    estado['EstadoTecnico'] = 'INVALIDO'
+
+  agi.verbose('NIS con estado tecnico: ' + estado['EstadoTecnico'])
+  agi.set_variable('__ESTADO_TECNICO', estado['EstadoTecnico'])
+  sys.exit()
